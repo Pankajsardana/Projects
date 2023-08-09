@@ -1,0 +1,54 @@
+﻿@model IEnumerable<WebApp.Models.EmployeeViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Employee List</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            @*<th>
+                @Html.DisplayNameFor(model => model.ImagePath)
+            </th>*@
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeeId)
+            </td>
+                <td>                   2
+                    <img src="~/images/@item.ImagePath" height="40" width="40" />
+                    @item.Name                 </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Address)
+            </td>
+            @*<td>
+                @Html.DisplayFor(modelItem => item.ImagePath)
+            </td>*@
+            <td>
+                    @Html.ActionLink("Edit", "Edit", new {  id=item.EmployeeId  }) |
+             
+                    @Html.ActionLink("Delete", "Delete", new {  id=item.EmployeeId  },
+                    new{onclick="return confirm('Are u sure to delete?')"})
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
