@@ -1,0 +1,15 @@
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\bin\Debug\net7.0\ePizzaHub.Core.deps.json
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\bin\Debug\net7.0\ePizzaHub.Core.dll
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\bin\Debug\net7.0\ePizzaHub.Core.pdb
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\bin\Debug\net7.0\ePizzaHub.Models.dll
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\bin\Debug\net7.0\ePizzaHub.Models.pdb
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ePizzaHub.Core.csproj.AssemblyReference.cache
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ePizzaHub.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ePizzaHub.Core.AssemblyInfoInputs.cache
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ePizzaHub.Core.AssemblyInfo.cs
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ePizzaHub.Core.csproj.CoreCompileInputs.cache
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ePizzaHub.Core.csproj.CopyComplete
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ePizzaHub.Core.dll
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\refint\ePizzaHub.Core.dll
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ePizzaHub.Core.pdb
+C:\Users\HP\source\repos\ePizzaHub14072023\ePizzaHub.Core\obj\Debug\net7.0\ref\ePizzaHub.Core.dll

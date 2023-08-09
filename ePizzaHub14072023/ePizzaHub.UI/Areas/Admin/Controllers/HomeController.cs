@@ -1,0 +1,19 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace ePizzaHub.UI.Areas.Admin.Controllers
+{
+
+    
+    public class HomeController : BaseController
+    {
+        public IActionResult Index()
+        {
+            //int userid = CurrentUser.Id;
+            return View();
+        }
+        public IActionResult LogOut()
+        {
+            return View();
+        }
+    }
+}
