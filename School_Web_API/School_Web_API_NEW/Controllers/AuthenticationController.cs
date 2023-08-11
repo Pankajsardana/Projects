@@ -16,6 +16,8 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using School_Web_API_NEW.Data.Helpers;
 
 namespace School_Web_API_NEW.Controllers
 {
@@ -29,15 +31,19 @@ namespace School_Web_API_NEW.Controllers
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
 
+        private readonly TokenValidationParameters _tokenValidationParameters;
+
         public AuthenticationController(UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
             AppDbContext context,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            TokenValidationParameters tokenValidationParameters)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
             _configuration = configuration;
+            _tokenValidationParameters = tokenValidationParameters;
         }
 
         [HttpPost("register-user")]
@@ -64,7 +70,26 @@ namespace School_Web_API_NEW.Controllers
             };
             var result = await _userManager.CreateAsync(newUser, registerVM.Password);
 
-            if (result.Succeeded) return Ok("User created");
+            if (result.Succeeded) {
+                //Add the user Role
+
+                switch (registerVM.Role) 
+                {
+                    case UserRoles.Manager:
+                        await _userManager.AddToRoleAsync(newUser,UserRoles.Manager);
+                        break;
+
+                    case UserRoles.Student:
+                        await _userManager.AddToRoleAsync(newUser, UserRoles.Student);
+                        break;
+                    default:
+                        break;
+
+
+                }
+
+                return Ok("User created"); 
+            }
             return BadRequest("User could not be created");
         }
         [HttpPost("login-user")]
@@ -78,7 +103,7 @@ namespace School_Web_API_NEW.Controllers
 
             if(userExists!= null && await _userManager.CheckPasswordAsync(userExists,loginVM.Password))
             {
-                var token = await GenerateJWTTokenAsync(userExists);
+                var token = await GenerateJWTTokenAsync(userExists,null);
 
 
                 return Ok(token);
@@ -86,7 +111,7 @@ namespace School_Web_API_NEW.Controllers
             return Unauthorized();
         }
 
-        private async Task<AuthResultVM> GenerateJWTTokenAsync(ApplicationUser user)
+        private async Task<AuthResultVM> GenerateJWTTokenAsync(ApplicationUser user, RefreshToken rToken)
         {
             var authClaim = new List<Claim>()
             {
@@ -98,6 +123,15 @@ namespace School_Web_API_NEW.Controllers
                 
 
             };
+            //Add user Role claims
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach(var role in userRoles) 
+            {
+                authClaim.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+
             var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:Issuer"],
@@ -108,13 +142,79 @@ namespace School_Web_API_NEW.Controllers
             
 
             var SecurityToken=new JwtSecurityTokenHandler().WriteToken(token);
+
+            if(rToken != null) 
+            {
+                var rTokenReponse = new AuthResultVM()
+                {
+                    Token=SecurityToken,
+                    RefreshToken=rToken.Token,
+                    ExpiresAt=token.ValidTo
+                };
+                return rTokenReponse;
+            }
+
+            var refreshToken = new RefreshToken()
+            {
+                JWTID=token.Id,
+                IsRevoked=false,
+                UserId=user.Id,
+                DateAdded=DateTime.UtcNow,
+                DateExpired=DateTime.UtcNow.AddMonths(6),
+                Token=Guid.NewGuid().ToString()+"-"+Guid.NewGuid().ToString(),
+
+            };
+            await _context.RefreshTokens.AddAsync(refreshToken);
+            await _context.SaveChangesAsync();
+
             var response = new AuthResultVM
             {
                 Token = SecurityToken,
+                RefreshToken=refreshToken.Token,
                 ExpiresAt = token.ValidTo
 
             };
             return response;
+        }
+
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] TokenRequestVM tokenRefreshVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Please provide all the details");
+            }
+            var result = await VerifyandGenerateToken(tokenRefreshVM);
+            return Ok(result);
+        }
+
+        private async Task<AuthResultVM> VerifyandGenerateToken(TokenRequestVM tokenRefreshVM)
+        {
+           var jwtSecurityTokenHandler =new JwtSecurityTokenHandler();
+            var storedToken=await _context.RefreshTokens.FirstOrDefaultAsync
+                (x=>x.Token==tokenRefreshVM.RefreshToken);
+
+            var dbUser = await _userManager.FindByIdAsync(storedToken.UserId);
+            try 
+            {
+                var tokenCheckResult = jwtSecurityTokenHandler.ValidateToken
+                    (tokenRefreshVM.Token, _tokenValidationParameters, out var validatedToken);
+                return await GenerateJWTTokenAsync(dbUser, storedToken);
+
+            }
+            catch (SecurityTokenException ex) 
+            {
+                if (storedToken.DateExpired >= DateTime.UtcNow) 
+                {
+                    return await  GenerateJWTTokenAsync(dbUser, storedToken);
+                }
+                else
+                {
+                    return await GenerateJWTTokenAsync(dbUser, null);
+                }
+            }
+            
         }
     }
 }

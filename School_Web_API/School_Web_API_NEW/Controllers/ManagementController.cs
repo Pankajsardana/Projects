@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using School_Web_API_NEW.Data.Helpers;
 
 namespace School_Web_API_NEW.Controllers
 {
-    [Route("api/[controller]")]
+
+    [Authorize(Roles=UserRoles.Manager)]
+   [Route("[controller]")]
     [ApiController]
     public class ManagementController : ControllerBase
     {
